@@ -10,7 +10,7 @@
     A simple and efficient CRUD To-Do List app built with C# .NET Core MVC, containerized with Docker using a multi-stage build, deployed on AWS EKS, and integrated with SQL Server Integration Services (SSIS) for powerful data workflows.
   </p>
   <blockquote>
-    🚀 This project is adapted from an open-source repo and significantly enhanced for production-ready cloud deployment with automated database migrations and container orchestration.
+    🚀 This project is adapted from an open-source repo and significantly enhanced for production-ready cloud deployment and container orchestration.
   </blockquote>
 
   <h2>📂 Repository</h2>
