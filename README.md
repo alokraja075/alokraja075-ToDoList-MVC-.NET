@@ -7,10 +7,10 @@
 <body>
   <h1>📝 To-Do List Web Application</h1>
   <p>
-    A simple and efficient CRUD To-Do List app built with C# .NET Core MVC, containerized with Docker, deployed on AWS EKS, and integrated with SQL Server Integration Services (SSIS) for powerful data workflows.
+    A simple and efficient CRUD To-Do List app built with C# .NET Core MVC, containerized with Docker using a multi-stage build, deployed on AWS EKS, and integrated with SQL Server Integration Services (SSIS) for powerful data workflows.
   </p>
   <blockquote>
-    🚀 This project is adapted from an open-source repo and significantly enhanced for production-ready cloud deployment.
+    🚀 This project is adapted from an open-source repo and significantly enhanced for production-ready cloud deployment with automated database migrations and container orchestration.
   </blockquote>
 
   <h2>📂 Repository</h2>
@@ -20,6 +20,10 @@
       https://github.com/alokraja075/alokraja075-ToDoList-MVC-.NET
     </a>
   </p>
+
+  <h2>🖼️ Screenshot</h2>
+  <p>Here's a preview of the application running locally:</p>
+  <img src="image.png" alt="To-Do List Application Screenshot" />
 
   <h2>🛠️ Table of Contents</h2>
   <ul>
@@ -49,13 +53,14 @@
       <pre><code>git clone https://github.com/alokraja075/alokraja075-ToDoList-MVC-.NET.git</code></pre>
     </li>
     <li>Open the project in Visual Studio or your preferred editor</li>
-    <li>Update your database connection string in <code>appsettings.json</code></li>
-    <li>Run EF Core migrations to set up the database schema:
+    <li>Update your database connection string in <code>appsettings.json</code> if needed (the Docker Compose file sets this automatically)</li>
+    <li>Run EF Core migrations to set up the database schema (optional if using Docker Compose):
       <pre><code>dotnet ef migrations add InitialCreate
 dotnet ef database update</code></pre>
     </li>
-    <li>Run the application locally using Docker Compose:
+    <li>Start the app and database with Docker Compose (recommended):
       <pre><code>docker-compose up --build</code></pre>
+      <p>This command builds the app image using a <strong>multi-stage Dockerfile</strong> that restores dependencies, compiles, publishes the app, and prepares a startup script to automatically run migrations before launching.</p>
     </li>
   </ol>
 
@@ -66,38 +71,64 @@ dotnet ef database update</code></pre>
     <li>🔍 View item details</li>
     <li>✍️ Edit existing items</li>
     <li>🗑️ Delete items with confirmation</li>
+    <li>🚀 Fully containerized with automated database migrations</li>
+    <li>🐳 Docker Compose orchestrates app and SQL Server containers with health checks and dependency management</li>
+    <li>☁️ Kubernetes manifests for deployment on AWS EKS</li>
+    <li>🔄 SSIS integration for advanced ETL and automation workflows</li>
   </ul>
 
   <h2 id="usage">💻 Usage</h2>
   <p>
     The application runs on port <strong>8080</strong> by default.<br />
-    After starting the app with Docker Compose, open your browser and navigate to:<br />
-    <a href="http://localhost:8080" target="_blank" rel="noopener noreferrer">http://localhost:8080/</a>
+    Start the full stack using Docker Compose:
+    <pre><code>docker-compose up --build</code></pre>
+    This will:
+    <ul>
+      <li>Build the .NET app using a multi-stage Dockerfile</li>
+      <li>Start an MS SQL Server container with a secure SA password and health checks</li>
+      <li>Ensure the app waits for the database to be healthy before running migrations and starting</li>
+      <li>Expose the app at <a href="http://localhost:8080" target="_blank" rel="noopener noreferrer">http://localhost:8080</a></li>
+    </ul>
   </p>
+  <p><strong>Stopping the app:</strong></p>
+  <pre><code>docker-compose down</code></pre>
 
   <h2 id="docker-support">🐳 Docker Support</h2>
-  <p>To simplify deployment and ensure consistency across environments, the app is containerized with Docker.</p>
+  <p>
+    The <strong>Dockerfile</strong> uses a multi-stage build:
+  </p>
   <ul>
-    <li>Build and start the app with Docker Compose:
-      <pre><code>docker-compose up --build</code></pre>
-    </li>
-    <li>Access the app at <a href="http://localhost:8080" target="_blank" rel="noopener noreferrer">http://localhost:8080</a></li>
+    <li><strong>Build stage:</strong> Uses the .NET SDK image to restore dependencies, build, publish the app, and install EF Core tools.</li>
+    <li><strong>Runtime stage:</strong> Copies the published output, installs EF Core tools, and sets up a startup script that waits for the database, runs migrations automatically, and then starts the app.</li>
+  </ul>
+  <p>
+    The <strong>docker-compose.yml</strong> defines two services:
+  </p>
+  <ul>
+    <li><code>db</code>: SQL Server 2019 container with environment variables for SA password and EULA acceptance, exposing port 1433, and a health check to ensure it's ready before the app starts.</li>
+    <li><code>web</code>: The app container built from your Dockerfile, exposing port 8080, dependent on the healthy database container, and configured with environment variables including the connection string pointing to the <code>db</code> service.</li>
   </ul>
 
   <h2 id="deployment-on-aws-eks">☁️ Deployment on AWS EKS</h2>
-  <p>Use Kubernetes manifests and Helm charts included in this project to deploy on Amazon EKS.</p>
+  <p>
+    Kubernetes manifests and Helm charts included in this repo facilitate deployment on AWS Elastic Kubernetes Service (EKS). Use these for production-grade, scalable cloud hosting.
+  </p>
   <ul>
-    <li>Configure AWS CLI and kubectl for your cluster</li>
-    <li>Deploy the app manifests:
+    <li>Configure AWS CLI and <code>kubectl</code> with your cluster credentials</li>
+    <li>Deploy the manifests:
       <pre><code>kubectl apply -f k8s/</code></pre>
     </li>
-    <li>Check deployment status:
-      <pre><code>kubectl get pods</code></pre>
+    <li>Monitor pods and services:
+      <pre><code>kubectl get pods
+kubectl get svc</code></pre>
     </li>
   </ul>
 
   <h2 id="ssis-integration">🔄 SSIS Integration</h2>
-  <p>This project integrates SQL Server Integration Services (SSIS) for advanced ETL workflows, data migration, and automation alongside the application database.</p>
+  <p>
+    This project integrates SQL Server Integration Services (SSIS) to support advanced ETL workflows, data migration, and automation, complementing the core To-Do CRUD functionalities.
+  </p>
+  <p>SSIS packages can be used to automate data processing tasks seamlessly alongside your application data.</p>
 
   <h2 id="contributing">🤝 Contributing</h2>
   <ol>
