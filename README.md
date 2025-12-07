@@ -1,150 +1,338 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>To-Do List Web Application — Enterprise README</title>
+
+  <!-- Mermaid (for diagrams) -->
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'default' });
+  </script>
+
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#94a3b8; --accent:#0066ff; --glass: rgba(255,255,255,0.04);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+    }
+    html,body{height:100%; margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#071023 0%, #071428 60%); color:#e6eef8;}
+    .container{max-width:1100px; margin:36px auto; padding:28px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px; box-shadow: 0 10px 30px rgba(2,6,23,0.7); border:1px solid rgba(255,255,255,0.03);}
+    header {display:flex; gap:16px; align-items:center;}
+    .logo {width:84px; height:84px; border-radius:12px; background:linear-gradient(135deg,#0ea5e9,#7c3aed); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 18px rgba(7,10,25,0.6);}
+    .logo svg{width:58px; height:58px}
+    h1{font-size:26px; margin:0;}
+    p.lead{margin:6px 0 18px; color:var(--muted);}
+
+    .badges {display:flex; gap:8px; flex-wrap:wrap}
+    .grid {display:grid; grid-template-columns: 320px 1fr; gap:20px; margin-top:20px;}
+    nav.card {background:var(--card); padding:16px; border-radius:10px; border:1px solid rgba(255,255,255,0.02);}
+    nav a{display:block; color:#cfe6ff; text-decoration:none; padding:8px 10px; border-radius:6px; margin-bottom:6px}
+    nav a:hover{background:var(--glass)}
+    nav small{display:block; color:var(--muted); margin-top:8px; font-size:12px}
+
+    main.card {background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)); padding:20px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); overflow:auto;}
+    section{margin-bottom:18px}
+    h2{font-size:18px; margin:0 0 8px}
+    .muted{color:var(--muted); font-size:13px}
+    pre {background: rgba(6,10,20,0.7); padding:12px; border-radius:8px; overflow:auto; color:#e6eef8; font-family:var(--mono); font-size:13px}
+    table{width:100%; border-collapse:collapse; margin-top:8px}
+    th,td{padding:8px 10px; border-bottom:1px solid rgba(255,255,255,0.03); text-align:left}
+    code.inline{background:rgba(255,255,255,0.03); padding:2px 6px; border-radius:6px; font-family:var(--mono); font-size:13px}
+
+    .two-col{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    .footer{margin-top:18px; color:var(--muted); font-size:13px; text-align:center}
+
+    /* responsive */
+    @media (max-width:920px){
+      .grid{grid-template-columns: 1fr; }
+      .logo{width:64px;height:64px}
+    }
+  </style>
 </head>
+
 <body>
-  <h1>📝 To-Do List Web Application</h1>
-  <p>
-    A simple and efficient CRUD To-Do List app built with C# .NET Core MVC, containerized with Docker using a multi-stage build, deployed on AWS EKS, integrated with SQL Server Integration Services (SSIS), and managed with ArgoCD for GitOps-based continuous deployment.
-  </p>
-  <blockquote>
-    🚀 This project is adapted from an open-source repo and enhanced for production-ready cloud deployment and container orchestration.
-  </blockquote>
+  <div class="container" role="main">
+    <header>
+      <div class="logo" aria-hidden="true">
+        <!-- Embedded SVG logo (image included in file) -->
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="none">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1">
+              <stop offset="0" stop-color="#06b6d4"/><stop offset="1" stop-color="#7c3aed"/>
+            </linearGradient>
+          </defs>
+          <rect rx="12" width="64" height="64" fill="url(#g1)"/>
+          <g transform="translate(10,12)" fill="#fff">
+            <rect x="0" y="0" width="44" height="6" rx="3"></rect>
+            <rect x="0" y="14" width="28" height="6" rx="3"></rect>
+            <rect x="0" y="28" width="36" height="6" rx="3"></rect>
+            <circle cx="40" cy="16" r="6"></circle>
+          </g>
+        </svg>
+      </div>
 
-  <h2>📂 Repository</h2>
-  <p>
-    Full source code available at:<br />
-    <a href="https://github.com/alokraja075/alokraja075-ToDoList-MVC-.NET" target="_blank" rel="noopener noreferrer">
-      https://github.com/alokraja075/alokraja075-ToDoList-MVC-.NET
-    </a>
-  </p>
+      <div>
+        <h1>To-Do List Web Application — Enterprise README</h1>
+        <p class="lead">ASP.NET Core MVC (.NET 8) To-Do app with SQL Server, Docker, EKS, ArgoCD & Azure Pipelines. Enterprise-ready README in modern HTML format with embedded images & diagrams.</p>
+        <div class="badges" aria-hidden="true">
+          <img src="https://img.shields.io/badge/.NET-8.0-blueviolet" alt=".NET 8" />
+          <img src="https://img.shields.io/badge/Docker-Enabled-blue" alt="Docker" />
+          <img src="https://img.shields.io/badge/Kubernetes-EKS-326ce5" alt="Kubernetes EKS" />
+          <img src="https://img.shields.io/badge/GitOps-ArgoCD-orange" alt="ArgoCD" />
+          <img src="https://img.shields.io/badge/CI%2FCD-Azure%20Pipelines-blue" alt="Azure Pipelines" />
+          <img src="https://img.shields.io/badge/License-MIT-green" alt="License MIT" />
+        </div>
+      </div>
+    </header>
 
-  <h2>🖼️ Screenshot</h2>
-  <p>Here's a preview of the application running locally:</p>
-  <img src="https://raw.githubusercontent.com/alokraja075/alokraja075-ToDoList-MVC-.NET/main/image.png" alt="To-Do List Application Screenshot" />
+    <div class="grid" role="region">
+      <nav class="card" aria-label="Quick links">
+        <strong>Quick Links</strong>
+        <a href="#overview">Overview</a>
+        <a href="#tech-stack">Technology Stack</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#quick-start">Quick Start</a>
+        <a href="#migrations">EF Core Migrations</a>
+        <a href="#docker">Docker & Compose</a>
+        <a href="#kubernetes">Kubernetes & ArgoCD</a>
+        <a href="#cicd">CI / CD (Azure Pipelines)</a>
+        <a href="#secrets">Config & Secrets</a>
+        <a href="#monitoring">Monitoring & Logging</a>
+        <a href="#repo-layout">Repository Layout</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+        <a href="#contributing">Contributing</a>
+        <a href="#license">License</a>
 
-  <h2>🛠️ Table of Contents</h2>
-  <ul>
-    <li><a href="#prerequisites">Prerequisites</a></li>
-    <li><a href="#getting-started">Getting Started</a></li>
-    <li><a href="#features">Features</a></li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#docker-support">Docker Support</a></li>
-    <li><a href="#deployment-on-aws-eks">Deployment on AWS EKS</a></li>
-    <li><a href="#argo-cd-deployment">ArgoCD Deployment</a></li>
-    <li><a href="#ssis-integration">SSIS Integration</a></li>
-    <li><a href="#port-forwarding">Port Forwarding</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-  </ul>
+        <small class="muted">Tip: press <kbd>Ctrl</kbd>+<kbd>F</kbd> to find sections quickly.</small>
+      </nav>
 
-  <h2 id="prerequisites">⚙️ Prerequisites</h2>
-  <ul>
-    <li>Visual Studio or your favorite IDE</li>
-    <li><a href="https://dotnet.microsoft.com/download" target="_blank" rel="noopener noreferrer">.NET Core SDK</a></li>
-    <li>A relational database (SQL Server, SQLite, etc.)</li>
-    <li><a href="https://www.docker.com/products/docker-desktop" target="_blank" rel="noopener noreferrer">Docker Desktop</a></li>
-    <li>AWS CLI and <code>kubectl</code> configured for EKS</li>
-    <li>ArgoCD installed and configured (https://argo-cd.readthedocs.io)</li>
-  </ul>
+      <main class="card" aria-live="polite">
+        <section id="overview">
+          <h2>Overview</h2>
+          <p class="muted">This repository contains an enterprise-ready To-Do application implemented in <strong>ASP.NET Core MVC (.NET 8)</strong>. It supports local development, containerized workflows, and production deployment using Kubernetes (AWS EKS) with ArgoCD GitOps and Azure Pipelines CI/CD.</p>
+        </section>
 
-  <h2 id="getting-started">🚀 Getting Started</h2>
-  <ol>
-    <li>Clone the repository:
-      <pre><code>git clone https://github.com/alokraja075/alokraja075-ToDoList-MVC-.NET.git</code></pre>
-    </li>
-    <li>Open the project in Visual Studio or your preferred editor</li>
-    <li>Update your database connection string in <code>appsettings.json</code> if needed</li>
-    <li>Run EF Core migrations to set up the database schema (optional if using Docker Compose):
-      <pre><code>dotnet ef migrations add InitialCreate
-dotnet ef database update</code></pre>
-    </li>
-    <li>Start the app and database with Docker Compose:
-      <pre><code>docker-compose up --build</code></pre>
-    </li>
-  </ol>
+        <section id="tech-stack">
+          <h2>Technology Stack</h2>
+          <table>
+            <thead><tr><th>Area</th><th>Technology</th></tr></thead>
+            <tbody>
+              <tr><td>Backend</td><td>C# / ASP.NET Core MVC (.NET 8), EF Core</td></tr>
+              <tr><td>Database</td><td>SQL Server 2019+</td></tr>
+              <tr><td>Containers</td><td>Docker, Docker Compose</td></tr>
+              <tr><td>Orchestration</td><td>Kubernetes (AWS EKS)</td></tr>
+              <tr><td>GitOps</td><td>ArgoCD</td></tr>
+              <tr><td>CI/CD</td><td>Azure Pipelines</td></tr>
+              <tr><td>Secrets</td><td>dotnet user-secrets, .env, Kubernetes Secrets</td></tr>
+            </tbody>
+          </table>
+        </section>
 
-  <h2 id="features">✨ Features</h2>
-  <ul>
-    <li>✅ View all To-Do items</li>
-    <li>✏️ Create new To-Do items</li>
-    <li>🔍 View item details</li>
-    <li>✍️ Edit existing items</li>
-    <li>🗑️ Delete items with confirmation</li>
-    <li>🚀 Fully containerized with automated database migrations</li>
-    <li>🐳 Docker Compose orchestrates app and SQL Server containers with health checks</li>
-    <li>☁️ Kubernetes manifests for deployment on AWS EKS</li>
-    <li>🔄 SSIS integration for ETL workflows</li>
-    <li>⚡ Continuous deployment with ArgoCD</li>
-  </ul>
+        <section id="architecture">
+          <h2>System Architecture</h2>
+          <div class="muted">Interactive Mermaid diagram — if not visible, ensure you have internet access to load the Mermaid CDN.</div>
+          <div class="mermaid" style="margin-top:12px;">
+            flowchart TD
+              A[User / Browser] --> B[ASP.NET Core MVC Web App]
+              B --> C[Entity Framework Core]
+              C --> D[(SQL Server Database)]
+              subgraph Local/Docker Layer
+                B
+                D
+              end
+              subgraph Container Runtime
+                B --> E[Docker Image]
+                D --> F[SQL Server Container]
+              end
+              subgraph Kubernetes (EKS)
+                E --> G[Deployment]
+                G --> H[Service (LoadBalancer)]
+                G --> I[Horizontal Pod Autoscaler]
+                F --> J[Kubernetes Persistent Volume]
+              end
+              subgraph GitOps
+                K[Git Repository] --> L[ArgoCD]
+                L --> G
+              end
+          </div>
+        </section>
 
-  <h2 id="usage">💻 Usage</h2>
-  <p>
-    Start the full stack using Docker Compose:
-    <pre><code>docker-compose up --build</code></pre>
-    Expose the app at <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>.
-  </p>
-  <p>Stop the stack:</p>
-  <pre><code>docker-compose down</code></pre>
+        <section id="workflow">
+          <h2>Deployment Workflow</h2>
+          <div class="mermaid" style="margin-top:12px;">
+            flowchart LR
+              Dev[Developer] --> Commit[Git Commit]
+              Commit --> CI[Azure Pipelines CI]
+              CI --> Build[Build Docker Image]
+              Build --> Registry[Push to Container Registry]
+              Registry --> YAML[Update k8s YAML (image tag)]
+              YAML --> Git[Commit k8s changes]
+              Git --> Argo[ArgoCD Sync]
+              Argo --> K8s[Deploy to EKS]
+          </div>
+        </section>
 
-  <h2 id="docker-support">🐳 Docker Support</h2>
-  <p>
-    Multi-stage Dockerfile:
-  </p>
-  <ul>
-    <li>Build stage: Restore dependencies, build, publish app, install EF Core tools.</li>
-    <li>Runtime stage: Copy published output, run migrations, start app.</li>
-  </ul>
-  <p>Docker Compose services:</p>
-  <ul>
-    <li><code>db</code>: SQL Server 2019 with health checks on port 1433</li>
-    <li><code>web</code>: .NET app container on port 8080, waits for healthy DB</li>
-  </ul>
-  <p>Docker image link: <a href="https://hub.docker.com/r/alokraja075/dissertation-todo" target="_blank">jyoti369/dissertation-todo</a></p>
+        <section id="quick-start">
+          <h2>Quick start (local)</h2>
+          <ol>
+            <li>Install prerequisites: <strong>.NET 8 SDK</strong>, <strong>Docker Desktop</strong>, optional <strong>SQL Server</strong> or use Docker Compose.</li>
+            <li>Run the app locally (no containers):</li>
+          </ol>
+          <pre><code>cd ToDo
+dotnet restore
+dotnet run
+</code></pre>
+          <p class="muted">App listens on ports defined in <code>Properties/launchSettings.json</code>. When using Docker Compose, the app maps to <code>http://localhost:8080</code> by default.</p>
+        </section>
 
-  <h2 id="deployment-on-aws-eks">☁️ Deployment on AWS EKS</h2>
-  <pre><code>kubectl apply -f k8s/</code></pre>
-  <p>Check pods and services:</p>
-  <pre><code>kubectl get pods
-kubectl get svc</code></pre>
+        <section id="migrations">
+          <h2>Database & EF Core Migrations</h2>
+          <p class="muted">The project uses EF Core migrations located in <code>ToDo/Data/Migrations</code>.</p>
+          <pre><code># create a migration (if needed)
+cd ToDo
+dotnet ef migrations add InitialCreate
 
-  <h2 id="argo-cd-deployment">🚀 ArgoCD Deployment</h2>
-  <p>
-    Use ArgoCD to manage continuous deployment:
-  </p>
-  <pre><code>argocd app create dissertation-app \
-  --repo https://github.com/alokraja075/alokraja075-ToDoList-MVC-.NET.git \
-  --path k8s \
-  --dest-server https://kubernetes.default.svc \
-  --dest-namespace default
-argocd app sync dissertation-app</code></pre>
+# apply migrations
+dotnet ef database update
+</code></pre>
+          <p class="muted">Local dev: use <code>dotnet user-secrets</code> for <code>ConnectionStrings:DefaultConnection</code>.</p>
+        </section>
 
-  <h2 id="port-forwarding">🔌 Port Forwarding</h2>
-  <p>
-    Forward the service ports to your local machine:
-  </p>
-  <pre><code>kubectl port-forward svc/todolist-web-service 8080:8080
-kubectl port-forward svc/todolist-db-service 1433:1433</code></pre>
+        <section id="docker">
+          <h2>Docker & Docker Compose</h2>
+          <p class="muted">The provided <code>docker-compose.yml</code> defines two services: <code>db</code> (SQL Server) and <code>web</code> (the app).</p>
+          <pre><code># start local containers
+docker-compose up --build
 
-  <h2 id="ssis-integration">🔄 SSIS Integration</h2>
-  <p>
-    Automate ETL workflows and data migrations with SQL Server Integration Services (SSIS).
-  </p>
+# stop
+docker-compose down
+</code></pre>
+          <p class="muted">Use <code>.env</code> (gitignored) to store <code>SA_PASSWORD</code>. Do NOT commit real credentials.</p>
+        </section>
 
-  <h2 id="contributing">🤝 Contributing</h2>
-  <ol>
-    <li>Fork the repository</li>
-    <li>Create a new branch for your feature or fix</li>
-    <li>Make your changes and commit with clear messages</li>
-    <li>Push to your fork</li>
-    <li>Open a pull request against the main repo</li>
-  </ol>
+        <section id="build-push">
+          <h2>Build & Push Docker Image</h2>
+          <pre><code># build locally
+docker build -t &lt;your-repo&gt;/dissertation-todo:local -f Dockerfile .
 
-  <h2 id="license">📄 License</h2>
-  <p>Specify your license here (e.g., MIT License).</p>
+# tag & push
+docker tag &lt;your-repo&gt;/dissertation-todo:local &lt;your-repo&gt;/dissertation-todo:1.0
+docker push &lt;your-repo&gt;/dissertation-todo:1.0
+</code></pre>
+          <p class="muted">CI pipeline (azure-pipelines.yml) automates build, push, and YAML updates for GitOps.</p>
+        </section>
 
-  <hr />
-  <p>Made with ❤️ by Alok Raja</p>
+        <section id="kubernetes">
+          <h2>Kubernetes & ArgoCD</h2>
+          <p class="muted">Kubernetes manifests are under <code>k8s/Dev</code>, <code>k8s/QA</code>, <code>k8s/Prod</code>. Use Kubernetes Secrets for sensitive values.</p>
+          <pre><code># create secret in namespace dev
+kubectl create secret generic todolist-mssql-secret \
+  --from-literal=SA_PASSWORD='&lt;YOUR_REAL_PASSWORD&gt;' \
+  --namespace dev
+</code></pre>
+          <p class="muted">Make deployment env vars use <code>valueFrom.secretKeyRef</code> or <code>envFrom.secretRef</code>.</p>
+        </section>
+
+        <section id="cicd">
+          <h2>CI / CD (Azure Pipelines)</h2>
+          <p class="muted">The <code>azure-pipelines.yml</code> shows a 3-stage flow:</p>
+          <ol>
+            <li>Build .NET project</li>
+            <li>Build & push Docker image</li>
+            <li>Update ArgoCD YAML and commit changes (GitOps)</li>
+          </ol>
+          <p class="muted">Store pipeline credentials in pipeline secret variables or Azure Key Vault.</p>
+        </section>
+
+        <section id="secrets">
+          <h2>Configuration & Secrets</h2>
+          <div class="two-col">
+            <div>
+              <h3>Local</h3>
+              <p class="muted">Use <code>dotnet user-secrets</code> or untracked <code>appsettings.Local.json</code>.</p>
+            </div>
+            <div>
+              <h3>Docker / Compose</h3>
+              <p class="muted">Use <code>.env</code> (gitignored) or Docker secrets.</p>
+            </div>
+          </div>
+
+          <p class="muted">Kubernetes: use <code>kubectl create secret</code>, or integrate Vault / External Secrets for stronger management.</p>
+        </section>
+
+        <section id="security">
+          <h2>Security: rotate & scrub secrets</h2>
+          <p class="muted">If a secret was committed, rotate it immediately and use <code>git-filter-repo</code> to scrub history.</p>
+          <pre><code># scrub sensitive value (use in separate mirror clone)
+python3 -m pip install git-filter-repo
+git clone --mirror https://github.com/your/repo.git repo-mirror.git
+cd repo-mirror.git
+
+# create replacements.txt with lines like:
+# oldSecret==<REDACTED_DB_PASSWORD>
+git filter-repo --replace-text replacements.txt
+
+# force push rewritten history
+git push --force --all
+git push --force --tags
+</code></pre>
+          <p class="muted">After rewrite, collaborators must re-clone the repo.</p>
+        </section>
+
+        <section id="monitoring">
+          <h2>Monitoring & Logging</h2>
+          <p class="muted">Recommended integrations (pick as appropriate):</p>
+          <ul>
+            <li>Logs: Serilog → CloudWatch / ELK</li>
+            <li>Metrics: Prometheus + Grafana</li>
+            <li>Kubernetes: node/pod metrics, liveness/readiness probes, HPA</li>
+            <li>ArgoCD: sync & drift monitoring</li>
+          </ul>
+        </section>
+
+        <section id="repo-layout">
+          <h2>Repository layout</h2>
+          <pre><code>/ToDo
+  /Controllers
+  /Models
+  /Data
+  /Views
+Dockerfile
+docker-compose.yml
+k8s/ (Dev, QA, Prod)
+azure-pipelines.yml
+README.md (this file)
+</code></pre>
+        </section>
+
+        <section id="troubleshooting">
+          <h2>Troubleshooting</h2>
+          <table>
+            <tbody>
+              <tr><td>EF migrations fail</td><td>Check ConnectionStrings:DefaultConnection and SQL Server reachability</td></tr>
+              <tr><td>SQL Server in Docker fails</td><td>Ensure Docker has ≥ 2GB memory and SA_PASSWORD meets complexity requirements</td></tr>
+              <tr><td>Port conflicts</td><td>Adjust ports in docker-compose.yml or launchSettings.json</td></tr>
+              <tr><td>ArgoCD OutOfSync</td><td>Ensure CI committed updated k8s YAML with proper image tag</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section id="contributing">
+          <h2>Contributing</h2>
+          <p class="muted">Please fork, create a feature branch, make changes, add tests where applicable, and open a pull request. Avoid committing secrets.</p>
+        </section>
+
+        <section id="license">
+          <h2>License & Contact</h2>
+          <p class="muted">This project is licensed under the <strong>MIT License</strong> (or your chosen license). Author: <strong>Alok Raja</strong>.</p>
+        </section>
+
+        <div class="footer">
+          <small class="muted">Made with ❤️ by Alok Raja — enterprise-ready README & deployment guides included.</small>
+        </div>
+      </main>
+    </div>
+  </div>
 </body>
 </html>
