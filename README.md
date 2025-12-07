@@ -146,7 +146,7 @@ ASP.NET Core MVC • Docker • SQL Server • Kubernetes • GitOps • CI/CD
 
 ### High-Level System Flow
 
-```mermaid
+ 
 flowchart TD
   A[User / Browser] --> B[ASP.NET Core MVC (.NET 8)]
   B --> C[Entity Framework Core]
@@ -173,7 +173,7 @@ flowchart TD
     Repo[Git Repo] --> Argo[ArgoCD]
     Argo --> G
   end
-```
+
 
 ---
 
