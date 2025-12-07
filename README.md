@@ -1,4 +1,6 @@
 
+---
+
 # 🚀 To-Do List Web Application
 
 ![.NET 8](https://img.shields.io/badge/.NET-8.0-blueviolet)
@@ -7,11 +9,26 @@
 ![ArgoCD](https://img.shields.io/badge/GitOps-ArgoCD-orange)
 ![Azure Pipelines](https://img.shields.io/badge/CI%2FCD-Azure%20Pipelines-blue)
 ![SQL Server](https://img.shields.io/badge/SQL-Server-critical)
+![Prometheus](https://img.shields.io/badge/Monitoring-Prometheus-orange)
+![Grafana](https://img.shields.io/badge/Dashboards-Grafana-yellow)
+![Loki](https://img.shields.io/badge/Logging-Loki-green)
+![Tempo](https://img.shields.io/badge/Tracing-Tempo-blue)
+![SonarQube](https://img.shields.io/badge/Code%20Quality-SonarQube-brightgreen)
+![Trivy](https://img.shields.io/badge/Trivy-Vulnerability%20Scanner-critical?logo=aqua-security&logoColor=white)
 ![MIT](https://img.shields.io/badge/License-MIT-green)
 
-A **cloud-ready, containerized, and GitOps-driven** To-Do List Web Application built using **ASP.NET Core MVC (.NET 8)**, **SQL Server**, **Docker**, and **Kubernetes (AWS EKS)** with **full CI/CD automation using Azure Pipelines** and continuous deployment via **ArgoCD**.
+A **cloud-ready, containerized, GitOps-driven**, and **fully observable** To-Do List Web Application built using:
 
-Designed for **enterprise development**, **DevOps workflows**, and **cloud-native production environments**.
+* **ASP.NET Core MVC (.NET 8)**
+* **SQL Server** with EF Core
+* **Docker & Docker Compose**
+* **Kubernetes (AWS EKS)**
+* **ArgoCD GitOps pipeline**
+* **Azure Pipelines CI/CD**
+* **Prometheus + Grafana + Loki + Tempo** for monitoring, logging & tracing
+* **SonarQube** for static code analysis and maintainability scoring
+* **Trivy** for docker image analysis and enforce image security gates before pushing images to a registry.
+This application is built for **enterprise DevOps workflows**, **production-ready observability**, and **cloud-native operational excellence**.
 
 ---
 
@@ -103,8 +120,9 @@ To-Do List Web Application — Enterprise Edition
 ASP.NET Core MVC • Docker • SQL Server • Kubernetes • GitOps • CI/CD
 ```
 
-(You may embed a PNG/SVG logo later.)
-
+  <h2>🖼️ Screenshot</h2>
+  <p>Here's a preview of the application running locally:</p>
+  <img src="image.png" alt="To-Do List Application Screenshot" />
 ---
 
 # 🛠️ Tech Stack
@@ -368,6 +386,160 @@ git push --force --tags
 * ArgoCD application health & drift detection
 
 ---
+
+
+### ✔ **Prometheus Integration**
+
+The application exposes Prometheus-friendly metrics via a `/metrics` endpoint (can be added using `prometheus-net` package).
+Prometheus collects:
+
+* Request rate
+* Response times
+* Error rate
+* CPU & memory metrics (via cAdvisor)
+* K8s pod/node metrics
+
+### ✔ **Grafana Dashboards**
+
+Grafana consumes Prometheus metrics and Loki logs to display:
+
+* Application performance dashboards
+* Request latency heatmaps
+* HPA scaling history
+* Container resource usage
+* Error frequency
+
+Custom dashboards can be imported using JSON templates.
+
+### ✔ **Loki (Centralized Logging)**
+
+Loki provides lightweight log aggregation with:
+
+* Zero-index logging
+* High retention at low cost
+* Native Grafana integration
+* Structured logs from ASP.NET Core (via Serilog → Loki sink)
+
+Logs can be queried with LogQL, allowing filtering by pod, namespace, correlation ID, etc.
+
+### ✔ **Tempo (Distributed Tracing)**
+
+Tempo enables **end-to-end request tracing** in microservices environments.
+
+* Works with OpenTelemetry
+* No dependency on external databases
+* Natively integrated with Grafana
+* Enables detection of slow requests & hidden bottlenecks
+
+### ✔ **SonarQube (Code Quality & Security)**
+
+Integrated into Azure Pipelines to ensure:
+
+* Code coverage enforcement
+* Bug & vulnerability detection
+* Code smells detection
+* Cyclomatic complexity reporting
+* Technical debt tracking
+
+SonarQube gates can block deployments if quality rules fail.
+
+---
+
+## 📊 Updated Monitoring & Observability Stack
+
+Here is the improved observability section you can insert into your README:
+
+---
+
+# 🔭 Monitoring, Logging & Tracing (Prometheus, Grafana, Loki, Tempo)
+
+The application supports a **full observability ecosystem**, enabling production-grade monitoring.
+
+## 🔹 **Prometheus (Metrics Collection)**
+
+Prometheus scrapes metrics from:
+
+* ASP.NET Core exporter (HTTP metrics)
+* K8s metrics-server
+* Node exporter
+* cAdvisor (container metrics)
+
+### Example scrape config:
+
+```yaml
+scrape_configs:
+  - job_name: 'todo-webapp'
+    static_configs:
+      - targets: ['todo-app-service:80']
+```
+
+---
+
+## 🔹 **Grafana (Dashboards & Visualization)**
+
+Dashboards include:
+
+* Application Performance Overview
+* API Latency Panels
+* System Resource Usage
+* Error/Error-rate dashboards
+* Pod-level utilization dashboards
+
+Grafana can also query Loki & Tempo for cross-panel linking.
+
+---
+
+## 🔹 **Loki (Centralized Logging)**
+
+Loki collects logs from:
+
+* Application pods via Promtail
+* K8s events
+* System components
+
+### Example Serilog configuration:
+
+```json
+"Serilog": {
+  "WriteTo": [
+    {
+      "Name": "GrafanaLoki",
+      "Args": {
+        "uri": "http://loki:3100",
+        "labels": { "app": "todo-webapp" }
+      }
+    }
+  ]
+}
+```
+
+Logs become searchable in Grafana using LogQL, such as:
+
+```
+{app="todo-webapp"} |= "ERROR"
+```
+
+---
+
+## 🔹 **Tempo (Distributed Tracing)**
+
+Tempo receives traces exported using **OpenTelemetry**.
+
+### Benefits:
+
+* Full request flow visibility
+* Root cause analysis for slow requests
+* Built-in Grafana UI
+
+### Example OTEL config snippet:
+
+```yaml
+exporters:
+  otlp:
+    endpoint: tempo:4317
+```
+
+
 
 # 🛡 Production Hardening Guide
 
