@@ -1,0 +1,176 @@
+trigger:
+  - none
+
+pool:
+  vmImage: ubuntu-latest
+
+parameters:
+  - name: environment
+    displayName: "Select Environment for Deployment"
+    type: string
+    default: "Dev"
+    values:
+      - Dev
+      - QA
+      - Prod
+
+  - name: promoteBuildId
+    displayName: "Enter Build ID to Promote (Only for QA/Prod)"
+    type: string
+    default: "latest"
+
+variables:
+  dockerImageName: alok075/dissertation-todo
+  dockerImageTag: '$(Build.BuildId)'
+  sonarProjectKey: '$(sonarProjectKey)'
+  sonarProjectName: 'Dissertation'
+  sonarProjectVersion: '1.0'
+
+# =========================
+# Stage 1: Build .NET Project
+# =========================
+stages:
+- stage: Build
+  displayName: Build .NET Project
+  jobs:
+  - job: DotNetBuild
+    displayName: Build and Publish .NET
+    steps:
+
+    # -------------------------------
+    # SonarQube Prepare
+    # -------------------------------
+    - task: SonarQubePrepare@5
+      displayName: 'Prepare SonarQube Analysis'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+      inputs:
+        SonarQube: 'SonarQube'
+        scannerMode: 'MSBuild'
+        projectKey: '$(sonarProjectKey)'
+        projectName: '$(sonarProjectName)'
+        extraProperties: |
+          sonar.projectVersion=$(sonarProjectVersion)
+
+    # -------------------------------
+    # .NET SDK and Build
+    # -------------------------------
+    - task: UseDotNet@2
+      displayName: 'Install .NET 8 SDK'
+      inputs:
+        packageType: 'sdk'
+        version: '8.0.x'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore NuGet packages'
+      inputs:
+        command: 'restore'
+        projects: '**/*.csproj'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Build project'
+      inputs:
+        command: 'build'
+        projects: '**/*.csproj'
+        arguments: '--configuration Release'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Publish project'
+      inputs:
+        command: 'publish'
+        projects: '**/*.csproj'
+        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+
+    # -------------------------------
+    # SonarQube Analyze & Publish
+    # -------------------------------
+    - task: SonarQubeAnalyze@5
+      displayName: 'Run SonarQube Analysis'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+
+    - task: SonarQubePublish@5
+      displayName: 'Publish SonarQube Quality Gate Result'
+      condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+      inputs:
+        pollingTimeoutSec: '300'
+
+# =========================
+# Stage 2: Build and Push Docker Image
+# =========================
+- stage: DockerBuildPush
+  displayName: Build & Push Docker Image
+  dependsOn: Build
+  condition: succeeded()
+  jobs:
+  - job: Docker
+    displayName: Docker Build & Push
+    steps:
+    - task: Docker@2
+      displayName: 'Login to Docker Hub'
+      inputs:
+        command: 'login'
+        containerRegistry: 'DockerHubConnection'
+
+    - task: Docker@2
+      displayName: 'Build Docker Image'
+      inputs:
+        command: 'build'
+        Dockerfile: '**/Dockerfile'
+        repository: $(dockerImageName)
+        tags: |
+          $(dockerImageTag)
+
+    - task: Docker@2
+      displayName: 'Push Docker Image'
+      inputs:
+        command: 'push'
+        repository: $(dockerImageName)
+        tags: |
+          $(dockerImageTag)
+
+# =========================
+# Stage 3: Deploy / Promote
+# =========================
+- stage: Deploy
+  displayName: "Deploy or Promote to ${{ parameters.environment }}"
+  dependsOn: DockerBuildPush
+  jobs:
+  - job: Deploy
+    steps:
+    - checkout: self
+      persistCredentials: true
+    - script: |
+        echo "Selected environment: ${{ parameters.environment }}"
+        BRANCH_NAME=$(Build.SourceBranchName)
+        echo "Branch detected: $BRANCH_NAME"
+
+        if [ "${{ parameters.environment }}" = "Dev" ]; then
+          IMAGE_TAG=$(Build.BuildId)
+        else
+          if [ -z "${{ parameters.promoteBuildId }}" ]; then
+            echo "ERROR: Please enter promoteBuildId for QA/Prod promotion!"
+            exit 1
+          fi
+          IMAGE_TAG=${{ parameters.promoteBuildId }}
+        fi
+
+        echo "Using image tag: $IMAGE_TAG"
+
+        ENV_FILE="k8s/${{ parameters.environment }}/${{ parameters.environment }}-ArgoCd.yaml"
+        echo "Updating $ENV_FILE ..."
+        sed -i "s|image: $(dockerImageName):.*|image: $(dockerImageName):$IMAGE_TAG|" "$ENV_FILE"
+      displayName: "Update ArgoCD YAML for selected environment"
+
+    - script: |
+        git config user.email "alok.raja075@outlook.com"
+        git config user.name "Alok Raja"
+
+        BRANCH_NAME=$(Build.SourceBranchName)
+        echo "Committing changes to branch: $BRANCH_NAME"
+
+        git checkout origin $BRANCH_NAME
+        git add k8s/${{ parameters.environment }}/${{ parameters.environment }}-ArgoCd.yaml
+        git commit -m "CI: Update ${{ parameters.environment }} image to $(dockerImageName):$(Build.BuildId)" || echo "No changes to commit"
+        git push origin HEAD:$BRANCH_NAME
+      displayName: "Commit & Push updated YAML to current branch"
+      env:
+        SYSTEM_ACCESSTOKEN: $(System.AccessToken)
