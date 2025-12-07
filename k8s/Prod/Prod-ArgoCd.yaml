@@ -1,0 +1,131 @@
+# -------------------------------
+# PersistentVolumeClaim
+# -------------------------------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mssql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+
+# -------------------------------
+# Database Deployment (Single Pod)
+# -------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todolist-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todolist-db
+  template:
+    metadata:
+      labels:
+        app: todolist-db
+    spec:
+      containers:
+      - name: mssql
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        ports:
+        - containerPort: 1433
+        env:
+        - name: SA_PASSWORD
+          value: "'<NEW_REAL_PASSWORD>'"
+        - name: ACCEPT_EULA
+          value: "Y"
+        volumeMounts:
+        - name: mssql-data
+          mountPath: /var/opt/mssql
+        readinessProbe:
+          exec:
+            command:
+            - /opt/mssql-tools18/bin/sqlcmd
+            - -S
+            - localhost
+            - -U
+            - sa
+            - -P
+            - "'<NEW_REAL_PASSWORD>'"
+            - -Q
+            - "SELECT 1"
+            - '-C'
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          failureThreshold: 10
+          timeoutSeconds: 10
+      volumes:
+      - name: mssql-data
+        persistentVolumeClaim:
+          claimName: mssql-pvc
+---
+
+# -------------------------------
+# Database Service
+# -------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: todolist-db-service
+spec:
+  selector:
+    app: todolist-db
+  ports:
+    - protocol: TCP
+      port: 1433
+      targetPort: 1433
+  clusterIP: None
+---
+
+# -------------------------------
+# Web App Deployment
+# -------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todolist-web
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: todolist-web
+  template:
+    metadata:
+      labels:
+        app: todolist-web
+    spec:
+      containers:
+      - name: dissertation-container
+        image: alok075/dissertation-todo:54
+        ports:
+          - containerPort: 80
+        env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: Development
+          - name: ASPNETCORE_URLS
+            value: http://+:80
+          - name: ConnectionStrings__DefaultConnection
+            value: "Server=todolist-db-service;Database=ToDo_db;User=sa;Password='<NEW_REAL_PASSWORD>';MultipleActiveResultSets=true;TrustServerCertificate=True"
+---
+
+# -------------------------------
+# Web Service (NodePort)
+# -------------------------------
+apiVersion: v1
+kind: Service
+metadata:
+  name: todolist-web-service
+spec:
+  type: NodePort
+  selector:
+    app: todolist-web
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30147
